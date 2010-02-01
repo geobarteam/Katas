@@ -18,10 +18,10 @@ namespace Visitor
             var subject = new ValidateBelgiumPhoneNumber();
             
             //Act
-            subject.Visit(phoneNumber);
+            bool result = subject.Validate(phoneNumber);
             
             //Assert
-            Assert.IsTrue(phoneNumber.IsValid);
+            Assert.IsTrue(result);
         }
 
 
@@ -33,10 +33,10 @@ namespace Visitor
             var subject = new ValidateBelgiumPhoneNumber();
 
             //Act
-            subject.Visit(phoneNumber);
+            bool result = subject.Validate(phoneNumber);
 
             //Assert
-            Assert.IsFalse(phoneNumber.IsValid);
+            Assert.IsFalse(result);
         }
 
         
@@ -49,26 +49,44 @@ namespace Visitor
             var subject = new EmailAddressValidator();
 
             //Act
-            subject.Visit(emailAddress);
+            bool result = subject.Validate(emailAddress);
 
             //Assert
-            Assert.IsFalse(emailAddress.IsValid);
+            Assert.IsFalse(result);
         }
 
         [Test]
-        public void Validate_WithValidEmail_ContactListIsValid()
+        public void Validate_WithValidArgs_ContactListIsValid()
         {
             //Arrenge
             var contactList = new ContactList();
             contactList.Add(new EmailAddress("good@email.com"));
+            contactList.Add(new PhoneNumber("32","022989878"));
 
             //Act
             contactList.Attach(new EmailAddressValidator());
+            contactList.Attach(new ValidateBelgiumPhoneNumber());
 
             //Assert
             Assert.IsTrue(contactList.IsValid);
         }
 
+        [Test]
+        public void Validate_WithInValidArgs_ContactListIsNotValid()
+        {
+            //Arrenge
+            var contactList = new ContactList();
+            contactList.Add(new EmailAddress("good@email.com"));
+            contactList.Add(new PhoneNumber("32", "02552989878"));
+            contactList.Add(new PhoneNumber("32", "0255245878"));
+
+            //Act
+            contactList.Attach(new EmailAddressValidator());
+            contactList.Attach(new ValidateBelgiumPhoneNumber());
+
+            //Assert
+            Assert.IsFalse(contactList.IsValid);
+        }
 
 
     }
@@ -76,57 +94,57 @@ namespace Visitor
 
     #region Extensions
 
-    public class ValidateBelgiumPhoneNumber : IVisitor
+    public class ValidateBelgiumPhoneNumber : IValidator
     {
-        public void Visit(Contact contact)
+        public bool Validate(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
-            if (phoneNumber == null || phoneNumber.CountryCode != "32") return;
+            if (phoneNumber == null || phoneNumber.CountryCode != "32") return true;
             var strRegex = @"^0[1-9]\d{7,8}$";
             var regex = new Regex(strRegex);
-            phoneNumber.IsValid = regex.IsMatch(phoneNumber.Number);
+            return regex.IsMatch(phoneNumber.Number);
         }
     }
 
-    public class ValidateFrenchPhoneNumber : IVisitor
+    public class ValidateFrenchPhoneNumber : IValidator
     {
-        public void Visit(Contact contact)
+        public bool Validate(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
-            if (phoneNumber == null || phoneNumber.CountryCode != "33") return;
+            if (phoneNumber == null || phoneNumber.CountryCode != "33") return true;
             var strRegex = @"^0[1-6]{1}(([0-9]{2}){4})|((\s[0-9]{2}){4})|((-[0-9]{2}){4})$";
             var regex = new Regex(strRegex);
-            phoneNumber.IsValid = regex.IsMatch(phoneNumber.Number);
+            return regex.IsMatch(phoneNumber.Number);
         }
     }
 
-    public class OnlyAcceptBelgiumAndFrenchCountryCode : IVisitor
+    public class OnlyAcceptBelgiumAndFrenchCountryCode : IValidator
     {
-        public void Visit(Contact contact)
+        public bool Validate(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
-            if (phoneNumber == null) return;
+            if (phoneNumber == null) return true;
 
-            phoneNumber.IsValid = (
+            return (
                 phoneNumber.CountryCode == "32" ||
                 phoneNumber.CountryCode == "33"
                 );
         }
     }
 
-    public class EmailAddressValidator : IVisitor
+    public class EmailAddressValidator : IValidator
     {
-        public void Visit(Contact contact)
+        public bool Validate(Contact contact)
         {
             var emailAddress = contact as EmailAddress;
-            if (emailAddress == null) return;
+            if (emailAddress == null) return true;
 
             string strRegex = @"^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}" +
                      @"\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\" + 
                      @".)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$";
             
             Regex re = new Regex(strRegex);
-            emailAddress.IsValid = re.IsMatch(emailAddress.ToString());
+            return re.IsMatch(emailAddress.ToString());
         }
     }
 
@@ -136,24 +154,22 @@ namespace Visitor
     #region DomainModel
     public class ContactList : List<Contact>
     {
+        bool _isValid = true;
+        
         public bool IsValid
         {
             get
             {
-                foreach (var item in this)
-                {
-                    if (!item.IsValid)
-                        return false;
-                }
-                return true;
+                return _isValid;
             }
+
         }
 
-        public void Attach(IVisitor visitor)
+        public void Attach(IValidator visitor)
         {
             foreach (var item in this)
             {
-                visitor.Visit(item);
+               _isValid = visitor.Validate(item) && _isValid;
             }
         }
     }
@@ -203,9 +219,9 @@ namespace Visitor
         }
     }
 
-    public interface IVisitor
+    public interface IValidator
     {
-        void Visit(Contact contact);
+        bool Validate(Contact contact);
     }
 
     #endregion
