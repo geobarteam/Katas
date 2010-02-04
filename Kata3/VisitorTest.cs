@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -19,10 +20,10 @@ namespace Visitor
             var subject = new ValidateBelgiumPhoneNumber();
             
             //Act
-            bool result = subject.Validate(phoneNumber);
+            var result = subject.BrokenRuleMessage(phoneNumber);
             
             //Assert
-            Assert.IsTrue(result);
+            Assert.AreEqual(string.Empty, result);
         }
 
 
@@ -34,10 +35,10 @@ namespace Visitor
             var subject = new ValidateBelgiumPhoneNumber();
 
             //Act
-            bool result = subject.Validate(phoneNumber);
+            var result = subject.BrokenRuleMessage(phoneNumber);
 
             //Assert
-            Assert.IsFalse(result);
+            Assert.AreEqual("+32.654 is not a valid Belgium phone number", result);
         }
 
         
@@ -50,10 +51,10 @@ namespace Visitor
             var subject = new EmailAddressValidator();
 
             //Act
-            bool result = subject.Validate(emailAddress);
+            var result = subject.BrokenRuleMessage(emailAddress);
 
             //Assert
-            Assert.IsFalse(result);
+            Assert.AreEqual("badAemail.com is not a valid e-mail", result);
         }
 
         [Test]
@@ -90,6 +91,23 @@ namespace Visitor
             Assert.IsFalse(contactList.IsValid);
         }
 
+        [Test]
+        public void Validate_WithInValidArgs_ContactListHasBrokenRuleMessage()
+        {
+            //Arrenge
+            var contactList = new ContactList();
+            contactList.Add(new EmailAddress("good@email.com"));
+            contactList.Add(new PhoneNumber("32", "02552989878"));
+            contactList.Add(new PhoneNumber("32", "0255245878"));
+
+            //Act
+            contactList.AddValidationRule(new EmailAddressValidator());
+            contactList.AddValidationRule(new ValidateBelgiumPhoneNumber());
+            contactList.Validate();
+            //Assert
+            Assert.IsFalse(contactList.ErrorMessages.Count() == 0);
+        }
+
 
     }
     # endregion
@@ -98,55 +116,69 @@ namespace Visitor
 
     public class ValidateBelgiumPhoneNumber : IValidationRule
     {
-        public bool Validate(Contact contact)
+        public string BrokenRuleMessage(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
-            if (phoneNumber == null || phoneNumber.CountryCode != "32") return true;
+            if (phoneNumber == null || phoneNumber.CountryCode != "32") return string.Empty;
             var strRegex = @"^0[1-9]\d{7,8}$";
             var regex = new Regex(strRegex);
-            return regex.IsMatch(phoneNumber.Number);
+            if (!regex.IsMatch(phoneNumber.Number))
+                return phoneNumber.ToString() + " is not a valid Belgium phone number";
+
+            return string.Empty;
         }
     }
 
     public class ValidateFrenchPhoneNumber : IValidationRule
     {
-        public bool Validate(Contact contact)
+        public string BrokenRuleMessage(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
-            if (phoneNumber == null || phoneNumber.CountryCode != "33") return true;
+            if (phoneNumber == null || phoneNumber.CountryCode != "33") return string.Empty;
             var strRegex = @"^0[1-6]{1}(([0-9]{2}){4})|((\s[0-9]{2}){4})|((-[0-9]{2}){4})$";
             var regex = new Regex(strRegex);
-            return regex.IsMatch(phoneNumber.Number);
+            if (!regex.IsMatch(phoneNumber.Number))
+                return phoneNumber.ToString() + " is not a valid French phone number";
+
+            return string.Empty;
         }
     }
 
     public class OnlyAcceptBelgiumAndFrenchCountryCode : IValidationRule
     {
-        public bool Validate(Contact contact)
+        public string BrokenRuleMessage(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
-            if (phoneNumber == null) return true;
+            if (phoneNumber == null) return string.Empty;
 
-            return (
-                phoneNumber.CountryCode == "32" ||
-                phoneNumber.CountryCode == "33"
-                );
+            if (
+                phoneNumber.CountryCode != "32" &&
+                phoneNumber.CountryCode != "33"
+                )
+            {
+                return phoneNumber.ToString() + " is not a valid Belgium or French phone number";
+            }
+
+            return string.Empty;
         }
     }
 
     public class EmailAddressValidator : IValidationRule
     {
-        public bool Validate(Contact contact)
+        public string BrokenRuleMessage(Contact contact)
         {
             var emailAddress = contact as EmailAddress;
-            if (emailAddress == null) return true;
+            if (emailAddress == null) return string.Empty;
 
             string strRegex = @"^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}" +
                      @"\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\" + 
                      @".)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$";
             
             Regex re = new Regex(strRegex);
-            return re.IsMatch(emailAddress.ToString());
+            if(!re.IsMatch(emailAddress.ToString()))
+                return emailAddress + " is not a valid emailAddress";
+
+            return string.Empty;
         }
     }
 
@@ -156,20 +188,27 @@ namespace Visitor
     #region DomainModel
     public class ContactList : List<Contact>
     {
-        private IList<IValidationRule> _validationRules;
+        IList<IValidationRule> _validationRules;
+        IEnumerable<string> _errorMessages;
 
         public ContactList()
         {
             _validationRules = new List<IValidationRule>();
         }
 
-        bool _isValid = true;
-        
         public bool IsValid
         {
             get
             {
-                return _isValid;
+                return ErrorMessages.Count()==0;
+            }
+        }
+
+        public IEnumerable<string> ErrorMessages
+        {
+            get
+            {
+                return _errorMessages;
             }
         }
         
@@ -180,12 +219,17 @@ namespace Visitor
 
         public void Validate()
         {
+            _errorMessages = getBrokenRules();
+        }
+
+        private IEnumerable<string> getBrokenRules()
+        {
             foreach (var item in this)
             {
                 foreach (var rule in _validationRules)
                 {
-                    _isValid = rule.Validate(item) && _isValid;
-                } 
+                    yield return rule.BrokenRuleMessage(item);
+                }
             }
         }
     }
@@ -237,7 +281,7 @@ namespace Visitor
 
     public interface IValidationRule
     {
-        bool Validate(Contact contact);
+        string BrokenRuleMessage(Contact contact);
     }
     #endregion
 
