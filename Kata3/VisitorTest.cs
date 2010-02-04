@@ -19,7 +19,7 @@ namespace Visitor
             var subject = new ValidateBelgiumPhoneNumber();
             
             //Act
-            bool result = subject.IsValid(phoneNumber);
+            bool result = subject.Validate(phoneNumber);
             
             //Assert
             Assert.IsTrue(result);
@@ -34,7 +34,7 @@ namespace Visitor
             var subject = new ValidateBelgiumPhoneNumber();
 
             //Act
-            bool result = subject.IsValid(phoneNumber);
+            bool result = subject.Validate(phoneNumber);
 
             //Assert
             Assert.IsFalse(result);
@@ -50,7 +50,7 @@ namespace Visitor
             var subject = new EmailAddressValidator();
 
             //Act
-            bool result = subject.IsValid(emailAddress);
+            bool result = subject.Validate(emailAddress);
 
             //Assert
             Assert.IsFalse(result);
@@ -98,7 +98,7 @@ namespace Visitor
 
     public class ValidateBelgiumPhoneNumber : IValidationRule
     {
-        public bool IsValid(Contact contact)
+        public bool Validate(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
             if (phoneNumber == null || phoneNumber.CountryCode != "32") return true;
@@ -110,7 +110,7 @@ namespace Visitor
 
     public class ValidateFrenchPhoneNumber : IValidationRule
     {
-        public bool IsValid(Contact contact)
+        public bool Validate(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
             if (phoneNumber == null || phoneNumber.CountryCode != "33") return true;
@@ -122,7 +122,7 @@ namespace Visitor
 
     public class OnlyAcceptBelgiumAndFrenchCountryCode : IValidationRule
     {
-        public bool IsValid(Contact contact)
+        public bool Validate(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
             if (phoneNumber == null) return true;
@@ -136,7 +136,7 @@ namespace Visitor
 
     public class EmailAddressValidator : IValidationRule
     {
-        public bool IsValid(Contact contact)
+        public bool Validate(Contact contact)
         {
             var emailAddress = contact as EmailAddress;
             if (emailAddress == null) return true;
@@ -182,9 +182,9 @@ namespace Visitor
         {
             foreach (var item in this)
             {
-                foreach (var visitor in _validationRules)
+                foreach (var rule in _validationRules)
                 {
-                    _isValid = visitor.IsValid(item) && _isValid;
+                    _isValid = rule.Validate(item) && _isValid;
                 } 
             }
         }
@@ -237,7 +237,7 @@ namespace Visitor
 
     public interface IValidationRule
     {
-        bool IsValid(Contact contact);
+        bool Validate(Contact contact);
     }
     #endregion
 
