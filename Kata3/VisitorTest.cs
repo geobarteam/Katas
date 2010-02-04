@@ -10,6 +10,20 @@ namespace Visitor
     [TestFixture]
     public class VisitorTest
     {
+        
+        
+        [Test]
+        public void TestLambdas()
+        {
+
+            List<int> numbers = new List<int> {1, 2, 3, 4, 5, 6, 7};
+            Func<int, bool> expr = n => n % 2==0;
+            var evens = numbers.FindAll(n=>expr(n));
+            foreach(var item in evens)
+            {Console.Write(item.ToString());}
+
+        }
+
         [Test]
         public void Visit_WithValidateBelgiumPhoneNumber_SetIsValidTrue()
         {

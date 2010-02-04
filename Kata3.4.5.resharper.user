@@ -11,11 +11,84 @@
   </NAntValidationSettings>
   <RecentFiles>
     <RecentFiles>
-      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="1873" fromTop="74" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="605" fromTop="16" />
     </RecentFiles>
-    <RecentEdits />
+    <RecentEdits>
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="7092" fromTop="19" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="16" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="9" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="15" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="19" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="15" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="29" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="22" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="18" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="30" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="8" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="18" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="8" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="8" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="17" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="18" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="30" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="24" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="6508" fromTop="2" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="76" fromTop="2" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="254" fromTop="12" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="592" fromTop="15" />
+      <File id="5F501328-33F1-4C4D-9FEF-506A6559C5D6/f:VisitorTest.cs" caret="592" fromTop="14" />
+    </RecentEdits>
   </RecentFiles>
   <UnitTestRunner>
     <Providers />
   </UnitTestRunner>
+  <CompletionStatisticsManager>
+    <ItemStatistics item="Default">
+      <Item value="bool" priority="3" />
+      <Item value="result" priority="2" />
+      <Item value="return" priority="4" />
+      <Item value="true" priority="3" />
+      <Item value="regex" priority="0" />
+      <Item value="if" priority="0" />
+      <Item value="_isValid" priority="0" />
+      <Item value="PhoneNumber" priority="0" />
+      <Item value="contactList" priority="0" />
+      <Item value="new" priority="1" />
+      <Item value="ValidateBelgiumPhoneNumber" priority="0" />
+      <Item value="Test" priority="0" />
+      <Item value="public" priority="0" />
+      <Item value="void" priority="0" />
+      <Item value="Delegate" priority="2" />
+      <Item value="int" priority="3" />
+      <Item value="ctx" priority="0" />
+      <Item value="s" priority="1" />
+      <Item value="List" priority="0" />
+      <Item value="List&lt;int&gt;" priority="0" />
+      <Item value="var" priority="4" />
+      <Item value="numbers" priority="3" />
+      <Item value="n" priority="2" />
+      <Item value="foreach" priority="0" />
+      <Item value="in" priority="0" />
+      <Item value="Console" priority="0" />
+      <Item value="item" priority="0" />
+      <Item value="Func" priority="0" />
+      <Item value="expr" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Visitor.ContactList">
+      <Item value="Attach" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.String">
+      <Item value="Length" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.List`1">
+      <Item value="FindAll" priority="2" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Console">
+      <Item value="Write" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Int32">
+      <Item value="CompareTo" priority="0" />
+      <Item value="ToString" priority="0" />
+    </ItemStatistics>
+  </CompletionStatisticsManager>
 </Configuration>
