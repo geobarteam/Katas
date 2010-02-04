@@ -10,19 +10,6 @@ namespace Visitor
     [TestFixture]
     public class VisitorTest
     {
-        
-        
-        [Test]
-        public void TestLambdas()
-        {
-
-            List<int> numbers = new List<int> {1, 2, 3, 4, 5, 6, 7};
-            Func<int, bool> expr = n => n % 2==0;
-            var evens = numbers.FindAll(n=>expr(n));
-            foreach(var item in evens)
-            {Console.Write(item.ToString());}
-
-        }
 
         [Test]
         public void Visit_WithValidateBelgiumPhoneNumber_SetIsValidTrue()
@@ -32,7 +19,7 @@ namespace Visitor
             var subject = new ValidateBelgiumPhoneNumber();
             
             //Act
-            bool result = subject.Validate(phoneNumber);
+            bool result = subject.IsValid(phoneNumber);
             
             //Assert
             Assert.IsTrue(result);
@@ -47,7 +34,7 @@ namespace Visitor
             var subject = new ValidateBelgiumPhoneNumber();
 
             //Act
-            bool result = subject.Validate(phoneNumber);
+            bool result = subject.IsValid(phoneNumber);
 
             //Assert
             Assert.IsFalse(result);
@@ -63,7 +50,7 @@ namespace Visitor
             var subject = new EmailAddressValidator();
 
             //Act
-            bool result = subject.Validate(emailAddress);
+            bool result = subject.IsValid(emailAddress);
 
             //Assert
             Assert.IsFalse(result);
@@ -78,8 +65,9 @@ namespace Visitor
             contactList.Add(new PhoneNumber("32","022989878"));
 
             //Act
-            contactList.Attach(new EmailAddressValidator());
-            contactList.Attach(new ValidateBelgiumPhoneNumber());
+            contactList.AddValidationRule(new EmailAddressValidator());
+            contactList.AddValidationRule(new ValidateBelgiumPhoneNumber());
+            contactList.Validate();
 
             //Assert
             Assert.IsTrue(contactList.IsValid);
@@ -95,9 +83,9 @@ namespace Visitor
             contactList.Add(new PhoneNumber("32", "0255245878"));
 
             //Act
-            contactList.Attach(new EmailAddressValidator());
-            contactList.Attach(new ValidateBelgiumPhoneNumber());
-
+            contactList.AddValidationRule(new EmailAddressValidator());
+            contactList.AddValidationRule(new ValidateBelgiumPhoneNumber());
+            contactList.Validate();
             //Assert
             Assert.IsFalse(contactList.IsValid);
         }
@@ -108,9 +96,9 @@ namespace Visitor
 
     #region Extensions
 
-    public class ValidateBelgiumPhoneNumber : IValidator
+    public class ValidateBelgiumPhoneNumber : IValidationRule
     {
-        public bool Validate(Contact contact)
+        public bool IsValid(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
             if (phoneNumber == null || phoneNumber.CountryCode != "32") return true;
@@ -120,9 +108,9 @@ namespace Visitor
         }
     }
 
-    public class ValidateFrenchPhoneNumber : IValidator
+    public class ValidateFrenchPhoneNumber : IValidationRule
     {
-        public bool Validate(Contact contact)
+        public bool IsValid(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
             if (phoneNumber == null || phoneNumber.CountryCode != "33") return true;
@@ -132,9 +120,9 @@ namespace Visitor
         }
     }
 
-    public class OnlyAcceptBelgiumAndFrenchCountryCode : IValidator
+    public class OnlyAcceptBelgiumAndFrenchCountryCode : IValidationRule
     {
-        public bool Validate(Contact contact)
+        public bool IsValid(Contact contact)
         {
             var phoneNumber = contact as PhoneNumber;
             if (phoneNumber == null) return true;
@@ -146,9 +134,9 @@ namespace Visitor
         }
     }
 
-    public class EmailAddressValidator : IValidator
+    public class EmailAddressValidator : IValidationRule
     {
-        public bool Validate(Contact contact)
+        public bool IsValid(Contact contact)
         {
             var emailAddress = contact as EmailAddress;
             if (emailAddress == null) return true;
@@ -168,6 +156,13 @@ namespace Visitor
     #region DomainModel
     public class ContactList : List<Contact>
     {
+        private IList<IValidationRule> _validationRules;
+
+        public ContactList()
+        {
+            _validationRules = new List<IValidationRule>();
+        }
+
         bool _isValid = true;
         
         public bool IsValid
@@ -176,14 +171,21 @@ namespace Visitor
             {
                 return _isValid;
             }
-
+        }
+        
+        public void AddValidationRule(IValidationRule visitor)
+        {
+            _validationRules.Add(visitor);
         }
 
-        public void Attach(IValidator visitor)
+        public void Validate()
         {
             foreach (var item in this)
             {
-               _isValid = visitor.Validate(item) && _isValid;
+                foreach (var visitor in _validationRules)
+                {
+                    _isValid = visitor.IsValid(item) && _isValid;
+                } 
             }
         }
     }
@@ -233,11 +235,10 @@ namespace Visitor
         }
     }
 
-    public interface IValidator
+    public interface IValidationRule
     {
-        bool Validate(Contact contact);
+        bool IsValid(Contact contact);
     }
-
     #endregion
 
 }
